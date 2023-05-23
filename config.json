@@ -18,5 +18,14 @@
     "data": {
       "name": "mohd anas"
     }
+  },
+  "login to foodie": {
+    "port": 3001,
+    "path": "login",
+    "method": "post",
+    "data": {
+      "mobile": "1234567890",
+      "password": "anax"
+    }
   }
 }

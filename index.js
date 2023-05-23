@@ -6,10 +6,16 @@ const input = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-console.log("welcome to poster");
+
+const filePath = process.cwd() + "/config.json";
+
+const print = (no, text) => {
+  console.log(`\x1b[${no}m%s\x1b[0m`, text);
+};
+
+print(33, "welcome to poster");
 
 const requiredProps = {
-  hostname: "localhost",
   port: "3000",
   protocol: "http",
   method: "get",
@@ -17,7 +23,7 @@ const requiredProps = {
 let base = "default";
 let req = "default";
 
-const file = fs.readFileSync("config.json");
+const file = fs.readFileSync(filePath);
 const config = JSON.parse(file);
 
 for (let x in requiredProps) {
@@ -26,7 +32,7 @@ for (let x in requiredProps) {
       config.default[x] = requiredProps[x];
     }
   } catch {
-    console.log("default property required!");
+    print(31, "default property required!");
     break;
   }
 }
@@ -41,6 +47,8 @@ const createUrl = () => {
     }
     return url;
   } catch (err) {
+    print(31, "wrong url pattern");
+    process.exit();
     return "";
   }
 };
@@ -52,7 +60,8 @@ const createOptions = () => {
         config[req][x] = config.default[x];
       }
     } catch (err) {
-      console.log("select request doesn't exists!");
+      print(31, "selected request doesn't exists!");
+      process.exit();
       return;
     }
   }
@@ -60,7 +69,6 @@ const createOptions = () => {
 
 const makeRequest = async () => {
   const url = createUrl();
-  if (!url) return;
   try {
     const res =
       config[req]["method"] == "get"
@@ -71,14 +79,19 @@ const makeRequest = async () => {
     console.log(`${res.status} : ${res.statusText}`);
     console.log(res.data);
   } catch (err) {
-    console.log(err.response.status);
+    if (err.response) {
+      print(31, err.response.status, ":", err.response.statusText);
+      print(35, err.response.data || "");
+      return;
+    }
+    print(31, "error");
   }
 };
 
 const gettingReq = () => {
-  console.log("select request");
+  print(32, "select request");
   for (let x in config) {
-    console.log(x);
+    print(36, x);
   }
   console.log("\n");
 };
@@ -92,7 +105,7 @@ await input.question("", (inp) => {
     req = inp;
     createOptions();
   }
-  console.log(`${req} selected to make request`);
+  print(35, `${req} selected to make request`);
   makeRequest();
   input.close();
 });
