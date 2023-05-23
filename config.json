@@ -1,9 +1,22 @@
 {
   "default": {
-    "hostname": "locahost",
-    "port": "3001"
+    "port": "5500"
   },
-  "get user contacts": {
-    "path": "getcontacts"
+  "add user": {
+    "path": "adduser",
+    "method": "post"
+  },
+  "login": {
+    "path": "login",
+    "method": "post",
+    "data": {
+      "name": "mohd anas",
+      "password": "anas"
+    }
+  },
+  "get user": {
+    "data": {
+      "name": "mohd anas"
+    }
   }
 }
