@@ -1,6 +1,9 @@
-import axios from "axios";
-import fs from "fs";
-import readline from "readline";
+#!/bin/node
+
+const axios = require("axios");
+const fs = require("fs");
+const readline = require("readline");
+const { exec } = require("child_process");
 
 const input = readline.createInterface({
   input: process.stdin,
@@ -19,6 +22,7 @@ const requiredProps = {
   port: "3000",
   protocol: "http",
   method: "get",
+  hostname: "localhost",
 };
 let base = "default";
 let req = "default";
@@ -96,8 +100,12 @@ const gettingReq = () => {
   console.log("\n");
 };
 
-gettingReq();
-await input.question("", (inp) => {
+const inputHandler = (inp) => {
+  if (inp == "exit" || inp == "close") process.exit();
+  if (inp == "clear" || inp == "cls") {
+    exec("clear", (err, output) => console.log(output));
+    return;
+  }
   if (!inp || inp == "default") {
     req = "default";
     createOptions();
@@ -105,7 +113,16 @@ await input.question("", (inp) => {
     req = inp;
     createOptions();
   }
-  print(35, `${req} selected to make request`);
-  makeRequest();
-  input.close();
-});
+};
+
+const loop = async () => {
+  gettingReq();
+  input.question("", (inp) => {
+    inputHandler(inp);
+    print(35, `${req} selected to make request`);
+    makeRequest().then(() => {
+      loop();
+    });
+  });
+};
+loop();
